@@ -74,7 +74,14 @@ public class PostController {
         }else if(type.equals("keyword")){
             temp=postService.getPostByKeyword(keyword);
         }else if(type.equals("id")){
-            if(userId!=-1) temp=postService.getPostByIdUserId(postingId,userId);
+            if(userId!=-1) {
+                temp=postService.getPostByIdUserId(postingId,userId);
+                if(temp.isEmpty()) {
+                    temp=postService.getPostById(postingId);
+
+                    temp.forEach(item->item.setCollectionId(null));
+                }
+            }
             else temp=postService.getPostById(postingId);
         }else if(type.equals("collection")){
             temp=postService.getPostByCollection(userId);

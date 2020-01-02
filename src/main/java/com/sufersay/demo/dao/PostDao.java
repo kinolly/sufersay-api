@@ -99,9 +99,9 @@ public interface PostDao {
     })
     List<postItem> getPostById(int id);
 
-    @Select(value = "select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,collection._id c_id" +
+    @Select(value = "select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,GROUP_CONCAT(collection._id) c_id" +
             " from posting LEFT JOIN collection on posting._id = collection.posting_id" +
-            " LEFT JOIN user on posting.user_id = user._id WHERE post_state=1 and posting._id =#{id} and collection.user_id=#{userId}")
+            " LEFT JOIN user on posting.user_id = user._id WHERE post_state=1 and posting._id =#{id} and collection.user_id=#{userId} GROUP BY posting._id")
     @Results({
             @Result(column="_id",property="id"),
             @Result(column="post_time",property="postTime"),
