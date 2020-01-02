@@ -19,5 +19,6 @@ public interface PostService {
     List<postItem> getPostByKeyword(String keyword);
     List<postItem> getPostById(int id);
     List<postItem> getPostByCollection(int userId);
+    List<postItem> getPostByIdUserId(int postingId,int userId);
 
 }

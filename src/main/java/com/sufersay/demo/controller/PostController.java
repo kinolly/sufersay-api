@@ -58,25 +58,49 @@ public class PostController {
      */
     @RequestMapping(value = "/get",method = RequestMethod.GET)
     public List<postItem> postGet(@RequestParam(name = "type",required = true,defaultValue = "") String type,
-                                  @RequestParam(name = "userId",required = false,defaultValue = "") Integer userId,
+                                  @RequestParam(name = "userId",required = false,defaultValue = "-1") Integer userId,
                                   @RequestParam(name = "postingId",required = false,defaultValue = "") Integer postingId,
                                   @RequestParam(name = "keyword",required = false,defaultValue = "") String keyword,
                                   @RequestParam(name = "pageNum",required = true,defaultValue = "") Integer pageNum,
                                   @RequestParam(name = "pageSize",required = true,defaultValue = "") Integer pageSize) {
+        List<postItem> temp = null;
         List<postItem> result = null;
         if(type.equals("user")) {
-            result=postService.getPostByUserId(userId);
+            temp=postService.getPostByUserId(userId);
         }else if(type.equals("new")){
-            result=postService.getPostByTime();
+            temp=postService.getPostByTime();
         }else if(type.equals("hot")){
-            result=postService.getPostByHot();
+            temp=postService.getPostByHot();
         }else if(type.equals("keyword")){
-            result=postService.getPostByKeyword(keyword);
+            temp=postService.getPostByKeyword(keyword);
         }else if(type.equals("id")){
-            result=postService.getPostById(postingId);
+            if(userId!=-1) temp=postService.getPostByIdUserId(postingId,userId);
+            else temp=postService.getPostById(postingId);
         }else if(type.equals("collection")){
-            result=postService.getPostByCollection(userId);
+            temp=postService.getPostByCollection(userId);
         }
-        return result;
+        if(temp != null){
+            int items = temp.size();
+            int pages = (int) Math.ceil(items*1.0/pageSize);
+            if(pageNum > pages) return null;
+            int reitems;
+            int l;
+            if(pageNum != 1) {
+                reitems = items - (pageNum - 1) * pageSize;
+                l = (pageNum-1)*pageSize;
+            }
+            else {
+                reitems=items;
+                l=0;
+            }
+            int tempPageSize=pageSize;
+            if(tempPageSize>reitems) tempPageSize=reitems;
+            result = temp.subList(l ,l + tempPageSize);
+            result.forEach(item->item.setItems(items));
+            result.forEach(item->item.setPageNum(pageNum));
+            result.forEach(item->item.setPageSize(pageSize));
+            return result;
+        }
+        else return result;
     }
 }

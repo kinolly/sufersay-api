@@ -31,19 +31,25 @@ public class CollectController {
                                  @RequestParam(name = "postingId", required = false, defaultValue = "")Integer postingId,
                                  @RequestParam(name = "collectionId", required = false, defaultValue = "")Integer collectionId,
                                  @RequestParam(name = "action",required = true, defaultValue = "")Integer action){
-        boolean flag=false;
-
+        boolean flag1=false;
+        boolean flag2=false;
         if(action == 2){
             Coll coll = new Coll();
             Date date = new Date();
             coll.setUserId(userId);
             coll.setPostingId(postingId);
             coll.setCreateTime(new Timestamp(date.getTime()));
-            flag=collectService.createColl(coll);
+            boolean isExit = collectService.isExist(userId,postingId);
+            if(!isExit) {
+                flag1=collectService.createColl(coll);
+                flag2=collectService.update(postingId);
+                return flag1 && flag2;
+            }
+
         }else if(action == 1){
-            flag=collectService.deleColl(collectionId);
+            flag1=collectService.deleColl(collectionId);
         }
-        return flag;
+        return flag1;
     }
 
 }

@@ -49,4 +49,8 @@ public class PostServiceImpl implements PostService {
     public List<postItem> getPostByCollection(int userId){
         return postDao.getPostByCollection(userId);
     }
+    @Override
+    public List<postItem> getPostByIdUserId(int postingId, int userId){
+        return  postDao.getPostByIdUserId(postingId, userId);
+    }
 }

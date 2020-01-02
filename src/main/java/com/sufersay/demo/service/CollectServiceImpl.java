@@ -22,11 +22,28 @@ public class CollectServiceImpl implements CollectService{
         return flag;
     }
     @Override
+    public boolean isExist(int userId,int postingId){
+        boolean flag = false;
+        if(!collectDao.isExist(postingId,userId).isEmpty()) flag=true;
+        return flag;
+    }
+    @Override
     public boolean deleColl(int id){
         boolean flag = false;
         try {
             collectDao.deleColl(id);
             flag = true;
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return flag;
+    }
+    @Override
+    public boolean update(int postingId){
+        boolean flag = false;
+        try{
+            collectDao.update(postingId);
+            flag=true;
         }catch (Exception e){
             e.printStackTrace();
         }

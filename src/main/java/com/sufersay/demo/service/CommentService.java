@@ -9,6 +9,7 @@ import java.util.List;
 public interface CommentService {
 
     //创建评论
+    boolean updateComment(Comment comment);
     boolean createComment(Comment comment);
 
     //获取评论列表

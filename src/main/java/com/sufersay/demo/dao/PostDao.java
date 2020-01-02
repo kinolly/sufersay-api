@@ -19,7 +19,7 @@ public interface PostDao {
 
     @Select("select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,GROUP_CONCAT(collection._id) c_id" +
             " from posting LEFT JOIN collection on posting._id = collection.posting_id" +
-            " LEFT JOIN user on posting.user_id = user._id WHERE posting.user_id=#{id} GROUP BY posting._id")
+            " LEFT JOIN user on posting.user_id = user._id WHERE posting.user_id=#{id} and post_state=1 GROUP BY posting._id")
         @Results({
                 @Result(column="_id",property="id"),
                 @Result(column="post_time",property="postTime"),
@@ -32,7 +32,7 @@ public interface PostDao {
 
     @Select(value = "select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,GROUP_CONCAT(collection._id) c_id" +
             " from posting LEFT JOIN collection on posting._id = collection.posting_id" +
-            " LEFT JOIN user on posting.user_id = user._id GROUP BY posting._id ORDER BY posting.post_time DESC")
+            " LEFT JOIN user on posting.user_id = user._id where post_state=1 GROUP BY posting._id ORDER BY posting.post_time DESC ")
     @Results({
             @Result(column="_id",property="id"),
             @Result(column="post_time",property="postTime"),
@@ -46,7 +46,7 @@ public interface PostDao {
     //按评论多少定义热度
     @Select(value = "select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,GROUP_CONCAT(collection._id) c_id" +
             " from posting LEFT JOIN collection on posting._id = collection.posting_id" +
-            " LEFT JOIN user on posting.user_id = user._id GROUP BY posting._id ORDER BY comment_num DESC")
+            " LEFT JOIN user on posting.user_id = user._id where post_state=1 GROUP BY posting._id ORDER BY comment_num DESC")
     @Results({
             @Result(column="_id",property="id"),
             @Result(column="post_time",property="postTime"),
@@ -60,7 +60,7 @@ public interface PostDao {
     //按收藏查询
     @Select(value = "select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,GROUP_CONCAT(collection._id) c_id" +
             " from posting LEFT JOIN collection on posting._id = collection.posting_id" +
-            " LEFT JOIN user on posting.user_id = user._id WHERE posting._id = collection.posting_id and collection.user_id=#{userId} GROUP BY posting._id")
+            " LEFT JOIN user on posting.user_id = user._id WHERE post_state=1 and posting._id = collection.posting_id and collection.user_id=#{userId} GROUP BY posting._id")
     @Results({
             @Result(column="_id",property="id"),
             @Result(column="post_time",property="postTime"),
@@ -74,7 +74,7 @@ public interface PostDao {
     //按关键字查询
     @Select(value = "select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,GROUP_CONCAT(collection._id) c_id" +
             " from posting LEFT JOIN collection on posting._id = collection.posting_id" +
-            " LEFT JOIN user on posting.user_id = user._id WHERE content LIKE '%${keyword}%' GROUP BY posting._id")
+            " LEFT JOIN user on posting.user_id = user._id WHERE post_state=1 and content LIKE '%${keyword}%' GROUP BY posting._id")
     @Results({
             @Result(column="_id",property="id"),
             @Result(column="post_time",property="postTime"),
@@ -88,7 +88,7 @@ public interface PostDao {
     //按postId查询
     @Select(value = "select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,GROUP_CONCAT(collection._id) c_id" +
             " from posting LEFT JOIN collection on posting._id = collection.posting_id" +
-            " LEFT JOIN user on posting.user_id = user._id WHERE posting._id =#{id} GROUP BY posting._id")
+            " LEFT JOIN user on posting.user_id = user._id WHERE post_state=1 and posting._id =#{id} GROUP BY posting._id")
     @Results({
             @Result(column="_id",property="id"),
             @Result(column="post_time",property="postTime"),
@@ -98,4 +98,17 @@ public interface PostDao {
             @Result(column="c_id",property="collectionId")
     })
     List<postItem> getPostById(int id);
+
+    @Select(value = "select posting._id,posting.post_time,user.username,posting.content,posting.comment_num,posting.collect_num,collection._id c_id" +
+            " from posting LEFT JOIN collection on posting._id = collection.posting_id" +
+            " LEFT JOIN user on posting.user_id = user._id WHERE post_state=1 and posting._id =#{id} and collection.user_id=#{userId}")
+    @Results({
+            @Result(column="_id",property="id"),
+            @Result(column="post_time",property="postTime"),
+            @Result(column="username",property="userName"),
+            @Result(column="comment_num",property="commentNumber"),
+            @Result(column="collect_num",property="collectNumber"),
+            @Result(column="c_id",property="collectionId")
+    })
+    List<postItem> getPostByIdUserId(int id,int userId);
 }

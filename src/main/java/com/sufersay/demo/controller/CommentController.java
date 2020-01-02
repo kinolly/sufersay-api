@@ -38,7 +38,9 @@ public class CommentController {
         comment.setContent(content);
         comment.setCreateTime(new Timestamp(date.getTime()));
         comment.setPostingId(postingId);
-        return commentService.createComment(comment);
+        boolean flag1=commentService.createComment(comment);
+        boolean flag2=commentService.updateComment(comment);
+        return flag1 && flag2;
     }
 
     /**
@@ -46,7 +48,7 @@ public class CommentController {
      *
      * @param type      获取方式
      * @param userId    用户Id，type为user时传⼊
-     * @param postingId 帖⼦id，type为id时传入
+     * @param postingId 帖⼦id，type为posting时传入
      * @param pageNum   当前页码
      * @param pageSize  页⾯⼤⼩（⼀页中包含⼏条结果）
      * @return
@@ -58,12 +60,33 @@ public class CommentController {
                                         @RequestParam(name = "pageNum",required = true,defaultValue = "") Integer pageNum,
                                         @RequestParam(name = "pageSize",required = true,defaultValue = "") Integer pageSize){
         List<commentItem> result = null;
-
+        List<commentItem> temp=null;
         if(type.equals("user")){
-            result = commentService.getCommentByUserId(userId);
-        }else if(type.equals("postingId")){
-            result = commentService.getCommentByPostingId(postingId);
+            temp = commentService.getCommentByUserId(userId);
+        }else if(type.equals("posting")){
+            temp = commentService.getCommentByPostingId(postingId);
         }
-        return result;
+        if(temp != null) {
+            int items = temp.size();
+            int pages = (int) Math.ceil(items * 1.0 / pageSize);
+            if (pageNum > pages) return null;
+            int reitems;
+            int l;
+            if (pageNum != 1) {
+                reitems = items - (pageNum - 1) * pageSize;
+                l = (pageNum - 1) * pageSize;
+            } else {
+                reitems = items;
+                l = 0;
+            }
+            int tempPageSize = pageSize;
+            if (tempPageSize > reitems) tempPageSize = reitems;
+            result = temp.subList(l, l + tempPageSize);
+            result.forEach(item -> item.setItems(items));
+            result.forEach(item -> item.setPageNum(pageNum));
+            result.forEach(item -> item.setPageSize(pageSize));
+            return result;
+        }
+        else return result;
     }
 }

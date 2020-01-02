@@ -15,6 +15,18 @@ public class CommentServiceImpl implements CommentService {
     private CommentDao commentDao;
 
     @Override
+    public boolean updateComment(Comment comment){
+        boolean flag = false;
+        try{
+            commentDao.updateComment(comment);
+            flag = true;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return flag;
+    }
+
+    @Override
     public boolean createComment(Comment comment){
         boolean flag = false;
         try{
